@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"time"
+	b "math/big"
     g "github.com/gosnmp/gosnmp"
 )
 
@@ -17,12 +18,8 @@ type Configuration struct {
 type OidResult struct {
 	OidName string
 	Oid 	string
-	Response  string
+	Response  *b.Int
 }
-
-
-
-
 
 func main() {
 
@@ -30,13 +27,16 @@ func main() {
 
 	var OidResultSet []OidResult
 
-	oids := []string{".1.3.6.1.4.1.2021.4.5.0", ".1.3.6.1.4.1.2021.4.6.0"}
+	mibs := map[string]string{
+	 	".1.3.6.1.4.1.2021.4.5.0": "memory_total",
+	 	".1.3.6.1.4.1.2021.4.6.0": "memory_total_used",
+	 }
 
-	// mibs := map[string]string{
-	// 	".1.3.6.1.4.1.2021.4.5.0": "memory_total",
-	// 	".1.3.6.1.4.1.2021.4.6.0": "memory_total_used",
-	// }
-
+	 oids := make([]string, 0, len(mibs))
+	for key, _ := range mibs {
+	oids = append(oids, key)
+	}
+	
 	config := setConfig()
 
 	g.Default.Target = config.OagIP
@@ -57,11 +57,12 @@ func main() {
 
 	for i, variable := range result.Variables {
 		fmt.Printf("%d: oid: %s ", i, variable.Name)
+		fmt.Println("variableName",variable.Name)
 
 		oidResult.Oid = variable.Name
-
-		// oidResult.OidName = mibs(variable.Name)
-
+		fmt.Println("oidResult.Oid",oidResult.Oid)
+		oidResult.OidName = mibs[variable.Name]
+		fmt.Println("oidResult.OidName",oidResult.OidName)
 		// the Value of each variable returned by Get() implements
 		// interface{}. You could do a type switch...
 		switch variable.Type {
@@ -69,22 +70,22 @@ func main() {
 			bytes := variable.Value.([]byte)
 			fmt.Printf("string: %s\n", string(bytes))
 
-			oidResult.Response = string(bytes)
-
 		default:
 			// ... or often you're just interested in numeric values.
 			// ToBigInt() will return the Value as a BigInt, for plugging
 			// into your calculations.
+			oidResult.Response = g.ToBigInt(variable.Value)
 			OidResultSet = append(OidResultSet, oidResult)
-
-			fmt.Printf("number: %d\n", g.ToBigInt(variable.Value))
+			fmt.Printf("number: %d\n", oidResult.Response)
+			
 		}
 	}
+	fmt.Println("length of ResultSet",len(OidResultSet))
 }
 
 func setConfig() (*Configuration){
 
-	configFile, err := os.Open("config/conf.json")
+	configFile, err := os.Open("output/config/conf.json")
 	if err != nil {
 		log.Fatal(err)
 	}
