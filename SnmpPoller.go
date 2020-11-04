@@ -1,16 +1,17 @@
-
 package main
+
 import (
 	"fmt"
+	"encoding/json"
 	"log"
-	//"os"
-    "time"
+	"os"
+	"time"
     g "github.com/gosnmp/gosnmp"
 )
 
-type Configs struct {
-	OagIP string
-	Community string
+type Configuration struct {
+	OagIP string `json:"oag_ip"`
+	Community string `json:"oag_cs"`
 }
 
 type OidResult struct {
@@ -36,8 +37,10 @@ func main() {
 	// 	".1.3.6.1.4.1.2021.4.6.0": "memory_total_used",
 	// }
 
-	g.Default.Target = "192.168.1.12"
-	g.Default.Community = "Ro4OAG4tw4yM0n1t0r1ng"
+	config := setConfig()
+
+	g.Default.Target = config.OagIP
+	g.Default.Community = config.Community
 	g.Default.Timeout = time.Duration(10 * time.Second) // Timeout better suited to walking
 
 	err := g.Default.Connect()
@@ -77,4 +80,24 @@ func main() {
 			fmt.Printf("number: %d\n", g.ToBigInt(variable.Value))
 		}
 	}
+}
+
+func setConfig() (*Configuration){
+
+	configFile, err := os.Open("config/conf.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer configFile.Close()
+
+	decoder := json.NewDecoder(configFile)
+	scConfig := Configuration{}
+	err = decoder.Decode(&scConfig)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+
+	return &scConfig
+
 }
