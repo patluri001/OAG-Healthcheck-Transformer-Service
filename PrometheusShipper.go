@@ -1,1 +1,1 @@
-sdcs
+package main
