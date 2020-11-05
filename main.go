@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"io/ioutil"
 	//"time"
 	"os"
@@ -8,6 +9,10 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	// b "math/big"
 )
 
 var log = logrus.New()
@@ -25,6 +30,14 @@ type Nodes struct {
 	Nodes []Configuration `json:"nodes"`
 }
 
+type OidResult struct {
+	OagNode  string
+	OidName  string
+	Oid      string
+	Response string
+}
+
+
 
 // func init() {
 // 	log.SetLevel(log.InfoLevel)
@@ -34,58 +47,34 @@ type Nodes struct {
 
 
 func main() {
-
-	// The API for setting attributes is a little different than the package level
-	  // exported logger. See Godoc.
-	  
-
-  	log.Out = os.Stdout
-
-	file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err == nil {
-	 log.Out = file
-	} else {
-	 log.Info("Failed to log to file, using default stderr")
-	}
-
-	log.Info("Create new cron")
-	c := cron.New()
-	c.AddFunc("*/1 * * * *", func() { 
-		log.Info("[Job 1]Every minute job\n") 
-		TriggerJob() 
-	})
+	// Prometheus: Histogram to collect required metrics
+	histogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "greeting_seconds",
+		Help:    "Time take to greet someone",
+		Buckets: []float64{1, 2, 5, 6, 10}, //defining small buckets as this app should not take more than 1 sec to respond
+	}, []string{"code"}) // this will be partitioned by the HTTP code.
 
 
-	// Start cron with one scheduled job
-	log.Info("Start cron")
-	c.Start()
-	printCronEntries(c.Entries())
-	for {
+	router := mux.NewRouter()
+	router.Handle("/metrics", Sayhello(histogram))
+	// router.Handle("/metrics", prometheus.Handler())
 
-	}
-	// time.Sleep(2 * time.Minute)
+	//Registering the defined metric with Prometheus
+	prometheus.Register(histogram)
 
-	// // Funcs may also be added to a running Cron
-	// log.Info("Add new job to a running cron")
-	// entryID2, _ := c.AddFunc("*/2 * * * *", func() { log.Info("[Job 2]Every two minutes job\n") })
-	// printCronEntries(c.Entries())
-	// time.Sleep(5 * time.Minute)
-
-	// //Remove Job2 and add new Job2 that run every 1 minute
-	// log.Info("Remove Job2 and add new Job2 with schedule run every minute")
-	// c.Remove(entryID2)
-	// c.AddFunc("*/1 * * * *", func() { log.Info("[Job 2]Every one minute job\n") })
-	// time.Sleep(5 * time.Minute)
-
+	log.Fatal(http.ListenAndServe(":9443", router))
 }
 
-func TriggerJob() {
+func TriggerJob() ([]OidResult){
 	configSet := setConfig()
+
+	var OidResultSet []OidResult
 
 	for _, config := range configSet.Nodes {
 		log.Info("get Healthcheck data for OAG IP:", config.OagIP)
-		SnmpPoller(&config)
-}
+		OidResultSet = SnmpPoller(&config)
+	}
+	return OidResultSet
 }
 
 func printCronEntries(cronEntries []cron.Entry) {
@@ -111,50 +100,3 @@ func printCronEntries(cronEntries []cron.Entry) {
 	
 		return nodes
 	}
-	
-
-// package main
-
-// import (
-// 	"encoding/json"
-// 	"fmt"
-// 	"log"
-// 	"os"
-// 	"github.com/robfig/cron/v3"
-// )
-
-
-
-
-// func main() {
-
-
-// 	c := cron.New()
-// 	fmt.Printf("Created New Cron Entry")
-// 	c.AddFunc("0 1 * * * *", func() { fmt.Println("Every minute job")} )
-
-// 	c.Start()
-
-// 	fmt.Printf("cron started")
-// 	// printCronEntries(c.Entries())
-// 	// time.Sleep(2 * time.Minute)
-
-
-
-// 	// fmt.Println("inside Main Method")
-
-
-
-// 	// }
-
-
-// }
-
-
-
-// 
-
-
-// func printCronEntries(cronEntries []cron.Entry) {
-// 	fmt.Printf("Cron Info: %+v\n", cronEntries)
-// }
