@@ -41,10 +41,6 @@ type OidResultSet struct {
 	oidResult OidResult
 }
 
-type HttpResponse struct {
-	OidResultSet []string
-}
-
 // func init() {
 // 	log.SetLevel(log.InfoLevel)
 // 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
@@ -72,14 +68,15 @@ func TriggerJob() []string {
 	configSet := setConfig()
 
 	//var OidResultSet []string
-	var httpResponse []OidResultSet
+	var httpResponse []string
+
 
 	for _, config := range configSet.Nodes {
 		log.Info("get Healthcheck data for OAG IP:", config.OagIP)
-		OidResultSet1 := SnmpPoller(&config)
-		OidResultSet = append(OidResultSet, OidResultSet1)
+		_ = SnmpPoller(&config, &httpResponse)
+
 	}
-	return OidResultSet1
+	return httpResponse
 }
 
 func printCronEntries(cronEntries []cron.Entry) {

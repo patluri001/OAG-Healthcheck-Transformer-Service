@@ -10,12 +10,10 @@ import (
 	g "github.com/gosnmp/gosnmp"
 )
 
-func SnmpPoller(config *Configuration) []string {
+func SnmpPoller(config *Configuration, OidResultSet *[]string)  (bool){
 
 	//initialize
 	oidResult := OidResult{}
-
-	var OidResultSet []string
 
 	mibs := map[string]string{
 		".1.3.6.1.4.1.2021.4.5.0":  "memory_total_installed",
@@ -90,7 +88,7 @@ func SnmpPoller(config *Configuration) []string {
 			// oidResult.Response = g.ToBigInt(variable.Value)
 
 			oidResult.Response = variable.Value.(string)
-			OidResultSet = append(OidResultSet, oidResult.OidName+oidResult.Response)
+			*OidResultSet = append(*OidResultSet, oidResult.OidName+oidResult.Response)
 			//OidResultSet = append(OidResultSet, oidResult)
 			//fmt.Printf("number: %d\n", oidResult.Response)
 
@@ -98,7 +96,7 @@ func SnmpPoller(config *Configuration) []string {
 		//fmt.Printf("OidResultSet: %d\n", OidResultSet[i].Response)
 	}
 
-	fmt.Println("length of ResultSet", len(OidResultSet))
+	// fmt.Println("length of ResultSet", len(*OidResultSet))
 
-	return OidResultSet
+	return true
 }

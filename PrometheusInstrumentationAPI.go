@@ -15,6 +15,7 @@ import (
 func Sayhello(histogram *prometheus.HistogramVec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		var returnString string
 		//monitoring how long it takes to respond
 		start := time.Now()
 		defer r.Body.Close()
@@ -31,14 +32,11 @@ func Sayhello(histogram *prometheus.HistogramVec) http.HandlerFunc {
 
 			// event, err := os.Open("config/data.txt")
 
-			OidResultSet := TriggerJob()
+			httpResp := TriggerJob()
 
-			var returnString string
-
-		//	for _,oidResult := range OidResultSet {
-		//		returnString += oidResult.OidName+ oidResult.Response
-
-			//}
+			for _,oneNodeResult := range httpResp {
+				returnString += oneNodeResult
+			}
 
 			// if err != nil {
 			// 	log.Fatal(err)
