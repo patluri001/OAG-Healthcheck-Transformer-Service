@@ -36,6 +36,8 @@ func Sayhello(histogram *prometheus.HistogramVec) http.HandlerFunc {
 
 			for _,oneNodeResult := range httpResp {
 				returnString += oneNodeResult
+				returnString += "\n"
+
 			}
 
 			// if err != nil {
