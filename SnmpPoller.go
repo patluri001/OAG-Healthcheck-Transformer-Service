@@ -2,18 +2,12 @@ package main
 
 import (
 	"fmt"
-	"encoding/json"
 	"log"
-	"os"
 	"time"
 	b "math/big"
     g "github.com/gosnmp/gosnmp"
 )
 
-type Configuration struct {
-	OagIP string `json:"oag_ip"`
-	Community string `json:"oag_cs"`
-}
 
 type OidResult struct {
 	OidName string
@@ -21,7 +15,7 @@ type OidResult struct {
 	Response  *b.Int
 }
 
-func main() {
+func SnmpPoller(config *Configuration) {
 
 	oidResult := OidResult{}
 
@@ -36,8 +30,6 @@ func main() {
 	for key, _ := range mibs {
 	oids = append(oids, key)
 	}
-	
-	config := setConfig()
 
 	g.Default.Target = config.OagIP
 	g.Default.Community = config.Community
@@ -81,24 +73,4 @@ func main() {
 		}
 	}
 	fmt.Println("length of ResultSet",len(OidResultSet))
-}
-
-func setConfig() (*Configuration){
-
-	configFile, err := os.Open("output/config/conf.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer configFile.Close()
-
-	decoder := json.NewDecoder(configFile)
-	scConfig := Configuration{}
-	err = decoder.Decode(&scConfig)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-
-	return &scConfig
-
 }
