@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	b "math/big"
 	"time"
@@ -79,7 +78,7 @@ func SnmpPoller(config *Configuration) {
 
 		oidResult.Oid = variable.Name
 		//fmt.Println("oidResult.Oid", oidResult.Oid)
-		oidResult.OidName = mibs[variable.Name]
+		oidResult.OidName = config.NodeName + "_" + mibs[variable.Name]
 		//fmt.Println("oidResult.OidName", oidResult.OidName)
 		// the Value of each variable returned by Get() implements
 		// interface{}. You could do a type switch...
@@ -99,11 +98,12 @@ func SnmpPoller(config *Configuration) {
 
 		}
 		//fmt.Printf("OidResultSet: %d\n", OidResultSet[i].Response)
+		log.Info(oidResult.OidName+" ", oidResult.Response)
 	}
 
 	log.Info("length of ResultSet", len(OidResultSet))
 	// Marshal the map into a JSON string.
-	nodeData, err := json.Marshal(OidResultSet)
+	/*nodeData, err := json.Marshal(OidResultSet)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -111,5 +111,5 @@ func SnmpPoller(config *Configuration) {
 
 	jsonStr := string(nodeData)
 	log.Info("JSON data is:")
-	log.Info(jsonStr)
+	log.Info(jsonStr)*/
 }
