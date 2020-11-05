@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	//"time"
 	"os"
 	"encoding/json"
@@ -12,11 +13,17 @@ import (
 var log = logrus.New()
 
 type Configuration struct {
-	OagIP string `json:"oag_ip"`
+	NodeName  string `json:"node_name"`
+	OagIP     string `json:"oag_ip"`
 	Community string `json:"oag_cs"`
 }
 
 type ConfigurationSet []Configuration
+
+
+type Nodes struct {
+	Nodes []Configuration `json:"nodes"`
+}
 
 
 // func init() {
@@ -44,8 +51,8 @@ func main() {
 	log.Info("Create new cron")
 	c := cron.New()
 	c.AddFunc("*/1 * * * *", func() { 
-		// TriggerJob() 
 		log.Info("[Job 1]Every minute job\n") })
+		TriggerJob() 
 
 	// Start cron with one scheduled job
 	log.Info("Start cron")
@@ -73,7 +80,7 @@ func main() {
 func TriggerJob() {
 	configSet := setConfig()
 
-	for _, config := range configSet {
+	for _, config := range configSet.Nodes {
 		log.Info("get Healthcheck data for OAG IP:", config.OagIP)
 		SnmpPoller(&config)
 }
@@ -84,7 +91,9 @@ func printCronEntries(cronEntries []cron.Entry) {
 }
 
 
-func setConfig() (ConfigurationSet){
+
+
+	func setConfig() Nodes {
 
 		configFile, err := os.Open("config/conf.json")
 		if err != nil {
@@ -93,17 +102,14 @@ func setConfig() (ConfigurationSet){
 	
 		defer configFile.Close()
 	
-		decoder := json.NewDecoder(configFile)
-		scConfig := ConfigurationSet{}
-		err = decoder.Decode(&scConfig)
-		if err != nil {
-			log.Info("error:", err)
-		}
+		byteValue, _ := ioutil.ReadAll(configFile)
+		var nodes Nodes
 	
-		return scConfig
+		json.Unmarshal(byteValue, &nodes)
 	
+		return nodes
 	}
-
+	
 
 // package main
 

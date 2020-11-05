@@ -3,24 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	b "math/big"
-	"os"
 	"time"
 
 	g "github.com/gosnmp/gosnmp"
 )
 
-type Nodes struct {
-	Nodes []Configuration `json:"nodes"`
-}
-
-type Configuration struct {
-	NodeName  string `json:"node_name"`
-	OagIP     string `json:"oag_ip"`
-	Community string `json:"oag_cs"`
-}
 
 type OidResult struct {
 	OagNode  string
@@ -30,6 +18,9 @@ type OidResult struct {
 }
 
 func SnmpPoller(config *Configuration) {
+
+	//initialize
+	oidResult := OidResult{}
 
 	var OidResultSet []OidResult
 
@@ -59,19 +50,16 @@ func SnmpPoller(config *Configuration) {
 	for key, _ := range mibs {
 		oids = append(oids, key)
 	}
-
-	config := setConfig()
-	for i := 0; i < len(config.Nodes); i++ {
-		fmt.Println("oag_ip: " + config.Nodes[i].NodeName)
-		fmt.Println("oag_ip: " + config.Nodes[i].OagIP)
-		fmt.Println("oag_cs: " + config.Nodes[i].Community)
-		//initialize
-		oidResult := OidResult{}
+	
+		fmt.Println("oag_ip: " + config.NodeName)
+		fmt.Println("oag_ip: " + config.OagIP)
+		fmt.Println("oag_cs: " + config.Community)
+	
 		var err error
 		var err2 error
 		//node_name := config.Nodes[i].NodeName
-		g.Default.Target = config.Nodes[0].OagIP
-		g.Default.Community = config.Nodes[0].Community
+		g.Default.Target = config.OagIP
+		g.Default.Community = config.Community
 		g.Default.Timeout = time.Duration(10 * time.Second) // Timeout better suited to walking
 
 		err = g.Default.Connect()
@@ -84,7 +72,7 @@ func SnmpPoller(config *Configuration) {
 		if err2 != nil {
 			log.Fatalf("Get() err: %v", err2)
 		}
-		oidResult.OagNode = config.Nodes[i].NodeName
+		oidResult.OagNode = config.NodeName
 		for _, variable := range result.Variables {
 			//fmt.Printf("%d: oid: %s ", i, variable.Name)
 			//fmt.Println("i ", i)
@@ -113,7 +101,7 @@ func SnmpPoller(config *Configuration) {
 			}
 			//fmt.Printf("OidResultSet: %d\n", OidResultSet[i].Response)
 		}
-	}
+	
 	fmt.Println("length of ResultSet", len(OidResultSet))
 	// Marshal the map into a JSON string.
 	nodeData, err := json.Marshal(OidResultSet)
@@ -127,19 +115,3 @@ func SnmpPoller(config *Configuration) {
 	fmt.Println(jsonStr)
 }
 
-func setConfig() *Nodes {
-
-	configFile, err := os.Open("output/config/conf.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer configFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(configFile)
-	var nodes Nodes
-
-	json.Unmarshal(byteValue, &nodes)
-
-	return &nodes
-}
