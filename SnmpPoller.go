@@ -87,8 +87,8 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 			// into your calculations.
 			// oidResult.Response = g.ToBigInt(variable.Value)
 
-			oidResult.Response = variable.Value.(string)
-			*OidResultSet = append(*OidResultSet, oidResult.OidName+oidResult.Response)
+			// oidResult.Response = variable.Value.(string)
+			*OidResultSet = append(*OidResultSet, oidResult.OidName+variable.Value.(string))
 			//OidResultSet = append(OidResultSet, oidResult)
 			//fmt.Printf("number: %d\n", oidResult.Response)
 
