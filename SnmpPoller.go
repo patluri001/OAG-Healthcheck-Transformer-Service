@@ -10,7 +10,7 @@ import (
 	g "github.com/gosnmp/gosnmp"
 )
 
-func SnmpPoller(config *Configuration, OidResultSet *[]string)  (bool){
+func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 
 	//initialize
 	oidResult := OidResult{}
