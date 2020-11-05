@@ -1,7 +1,7 @@
 package main
 
 import (
-	"time"
+	//"time"
 	"os"
 	"encoding/json"
 
@@ -29,7 +29,9 @@ type ConfigurationSet []Configuration
 func main() {
 
 	// The API for setting attributes is a little different than the package level
-  	// exported logger. See Godoc.
+	  // exported logger. See Godoc.
+	  
+
   	log.Out = os.Stdout
 
 	file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -49,7 +51,10 @@ func main() {
 	log.Info("Start cron")
 	c.Start()
 	printCronEntries(c.Entries())
-	time.Sleep(2 * time.Minute)
+	for {
+
+	}
+	// time.Sleep(2 * time.Minute)
 
 	// // Funcs may also be added to a running Cron
 	// log.Info("Add new job to a running cron")
