@@ -5,6 +5,5 @@ Build
 
 Running in Silent Mode
 
-`cd output`
-`\n` 
-`./oag-hc-transformer&`
+cd output
+./oag-hc-transformer&
