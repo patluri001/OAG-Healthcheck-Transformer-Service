@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	
 	"time"
 	b "math/big"
     g "github.com/gosnmp/gosnmp"
