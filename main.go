@@ -51,8 +51,10 @@ func main() {
 	log.Info("Create new cron")
 	c := cron.New()
 	c.AddFunc("*/1 * * * *", func() { 
-		log.Info("[Job 1]Every minute job\n") })
+		log.Info("[Job 1]Every minute job\n") 
 		TriggerJob() 
+	})
+
 
 	// Start cron with one scheduled job
 	log.Info("Start cron")
