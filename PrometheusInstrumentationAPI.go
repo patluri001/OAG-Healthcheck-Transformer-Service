@@ -35,10 +35,10 @@ func Sayhello(histogram *prometheus.HistogramVec) http.HandlerFunc {
 
 			var returnString string
 
-			for _,oidResult := range OidResultSet {
-				returnString += oidResult.OidName+ oidResult.Response
+		//	for _,oidResult := range OidResultSet {
+		//		returnString += oidResult.OidName+ oidResult.Response
 
-			}
+			//}
 
 			// if err != nil {
 			// 	log.Fatal(err)
