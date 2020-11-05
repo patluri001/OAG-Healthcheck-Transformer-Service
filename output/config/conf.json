@@ -1,4 +1,11 @@
-{
+[
+    {
     "oag_ip": "192.168.1.12",
     "oag_cs": "Ro4OAG4tw4yM0n1t0r1ng"
+},
+{
+    "oag_ip": "192.168.1.11",
+    "oag_cs": "Ro4OAG4tw4yM0n1t0r1ng"
 }
+]
+
