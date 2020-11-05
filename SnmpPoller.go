@@ -35,6 +35,13 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 		//	".1.3.6.1.2.1.1.1.0":         "sys_obj_oag_appliance",
 		//	".1.3.6.1.2.1.1.4.0":         "sys_obj_oag_support",
 		//	".1.3.6.1.2.1.1.5.0":         "sys_obj_dev",
+		//".1.3.6.1.4.1.2021.10.1.3.1": "sys_onemin_average",
+		".1.3.6.1.4.1.2021.16.2.1.1.1": "poll_session_logwatch_1",
+		".1.3.6.1.4.1.2021.16.2.1.1.2": "poll_session_logwatch_2",
+		".1.3.6.1.4.1.2021.16.2.1.1.3": "poll_session_logwatch_3",
+		".1.3.6.1.4.1.2021.2.1.5.3":    "poll_process_objects_HA",
+		".1.3.6.1.4.1.2021.2.1.4.3":    "poll_process_objects_Time_Svc",
+		".1.3.6.1.4.1.2021.2.1.3.3":    "poll_process_objects_web_proc_svc",
 	}
 
 	oids := make([]string, 0, len(mibs))
@@ -89,10 +96,10 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 
 			// oidResult.Response = variable.Value.(string)
 
-			log.Info("Pinting the Value::",fmt.Sprint(g.ToBigInt(variable.Value)))
-			*OidResultSet = append(*OidResultSet, oidResult.OagNode+ "_"  + oidResult.OidName+" "+fmt.Sprint(g.ToBigInt(variable.Value)))
+			log.Info("Pinting the Value::", fmt.Sprint(g.ToBigInt(variable.Value)))
+			*OidResultSet = append(*OidResultSet, oidResult.OagNode+"_"+oidResult.OidName+" "+fmt.Sprint(g.ToBigInt(variable.Value)))
 
-			log.Info("Length of ResultSet::",)
+			//log.Info("Length of ResultSet::",)
 			//OidResultSet = append(OidResultSet, oidResult)
 			//fmt.Printf("number: %d\n", oidResult.Response)
 
