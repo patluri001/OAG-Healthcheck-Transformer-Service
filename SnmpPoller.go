@@ -9,7 +9,6 @@ import (
 	g "github.com/gosnmp/gosnmp"
 )
 
-
 type OidResult struct {
 	OagNode  string
 	OidName  string
@@ -50,59 +49,59 @@ func SnmpPoller(config *Configuration) {
 	for key, _ := range mibs {
 		oids = append(oids, key)
 	}
-	
-		fmt.Println("oag_ip: " + config.NodeName)
-		fmt.Println("oag_ip: " + config.OagIP)
-		fmt.Println("oag_cs: " + config.Community)
-	
-		var err error
-		var err2 error
-		//node_name := config.Nodes[i].NodeName
-		g.Default.Target = config.OagIP
-		g.Default.Community = config.Community
-		g.Default.Timeout = time.Duration(10 * time.Second) // Timeout better suited to walking
 
-		err = g.Default.Connect()
-		if err != nil {
-			log.Fatalf("Connect() err: %v", err)
+	log.Info("NodeName: " + config.NodeName)
+	log.Info("oag_ip: " + config.OagIP)
+	log.Info("oag_cs: " + config.Community)
+
+	var err error
+	var err2 error
+	//node_name := config.Nodes[i].NodeName
+	g.Default.Target = config.OagIP
+	g.Default.Community = config.Community
+	g.Default.Timeout = time.Duration(10 * time.Second) // Timeout better suited to walking
+
+	err = g.Default.Connect()
+	if err != nil {
+		log.Fatalf("Connect() err: %v", err)
+	}
+	defer g.Default.Conn.Close()
+	//var result g.SnmpPacket
+	result, err2 := g.Default.Get(oids) // Get() accepts up to g.MAX_OIDS
+	if err2 != nil {
+		log.Fatalf("Get() err: %v", err2)
+	}
+	oidResult.OagNode = config.NodeName
+	for _, variable := range result.Variables {
+		//fmt.Printf("%d: oid: %s ", i, variable.Name)
+		//fmt.Println("i ", i)
+		//fmt.Println("variableName", variable.Name)
+
+		oidResult.Oid = variable.Name
+		//fmt.Println("oidResult.Oid", oidResult.Oid)
+		oidResult.OidName = mibs[variable.Name]
+		//fmt.Println("oidResult.OidName", oidResult.OidName)
+		// the Value of each variable returned by Get() implements
+		// interface{}. You could do a type switch...
+		switch variable.Type {
+		case g.OctetString:
+			bytes := variable.Value.([]byte)
+
+			fmt.Println("string: %s\n", string(bytes))
+
+		default:
+			// ... or often you're just interested in numeric values.
+			// ToBigInt() will return the Value as a BigInt, for plugging
+			// into your calculations.
+			oidResult.Response = g.ToBigInt(variable.Value)
+			OidResultSet = append(OidResultSet, oidResult)
+			//fmt.Printf("number: %d\n", oidResult.Response)
+
 		}
-		defer g.Default.Conn.Close()
-		//var result g.SnmpPacket
-		result, err2 := g.Default.Get(oids) // Get() accepts up to g.MAX_OIDS
-		if err2 != nil {
-			log.Fatalf("Get() err: %v", err2)
-		}
-		oidResult.OagNode = config.NodeName
-		for _, variable := range result.Variables {
-			//fmt.Printf("%d: oid: %s ", i, variable.Name)
-			//fmt.Println("i ", i)
-			//fmt.Println("variableName", variable.Name)
+		//fmt.Printf("OidResultSet: %d\n", OidResultSet[i].Response)
+	}
 
-			oidResult.Oid = variable.Name
-			//fmt.Println("oidResult.Oid", oidResult.Oid)
-			oidResult.OidName = mibs[variable.Name]
-			//fmt.Println("oidResult.OidName", oidResult.OidName)
-			// the Value of each variable returned by Get() implements
-			// interface{}. You could do a type switch...
-			switch variable.Type {
-			case g.OctetString:
-				bytes := variable.Value.([]byte)
-
-				fmt.Printf("string: %s\n", string(bytes))
-
-			default:
-				// ... or often you're just interested in numeric values.
-				// ToBigInt() will return the Value as a BigInt, for plugging
-				// into your calculations.
-				oidResult.Response = g.ToBigInt(variable.Value)
-				OidResultSet = append(OidResultSet, oidResult)
-				//fmt.Printf("number: %d\n", oidResult.Response)
-
-			}
-			//fmt.Printf("OidResultSet: %d\n", OidResultSet[i].Response)
-		}
-	
-	fmt.Println("length of ResultSet", len(OidResultSet))
+	log.Info("length of ResultSet", len(OidResultSet))
 	// Marshal the map into a JSON string.
 	nodeData, err := json.Marshal(OidResultSet)
 	if err != nil {
@@ -111,7 +110,6 @@ func SnmpPoller(config *Configuration) {
 	}
 
 	jsonStr := string(nodeData)
-	fmt.Println("JSON data is:")
-	fmt.Println(jsonStr)
+	log.Info("JSON data is:")
+	log.Info(jsonStr)
 }
-
