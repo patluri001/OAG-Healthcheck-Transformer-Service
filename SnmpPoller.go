@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	b "math/big"
+	"os"
 	"time"
 
 	g "github.com/gosnmp/gosnmp"
@@ -70,7 +71,13 @@ func SnmpPoller(config *Configuration) {
 	if err2 != nil {
 		log.Fatalf("Get() err: %v", err2)
 	}
-	oidResult.OagNode = config.NodeName
+	//oidResult.OagNode = config.NodeName
+	f, err := os.OpenFile("data.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
 	for _, variable := range result.Variables {
 		//fmt.Printf("%d: oid: %s ", i, variable.Name)
 		//fmt.Println("i ", i)
@@ -99,6 +106,17 @@ func SnmpPoller(config *Configuration) {
 		}
 		//fmt.Printf("OidResultSet: %d\n", OidResultSet[i].Response)
 		log.Info(oidResult.OidName+" ", oidResult.Response)
+		fmt.Fprintln(f, oidResult.OidName+" ", oidResult.Response)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	log.Info("length of ResultSet", len(OidResultSet))
