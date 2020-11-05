@@ -73,7 +73,7 @@ func TriggerJob() []string {
 
 	for _, config := range configSet.Nodes {
 		log.Info("get Healthcheck data for OAG IP:", config.OagIP)
-		_ = SnmpPoller(&config, &httpResponse)
+		SnmpPoller(&config, &httpResponse)
 
 	}
 	return httpResponse

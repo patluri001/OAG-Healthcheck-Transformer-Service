@@ -98,5 +98,4 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string)  (bool){
 
 	// fmt.Println("length of ResultSet", len(*OidResultSet))
 
-	return true
 }
