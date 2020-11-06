@@ -6,5 +6,5 @@ services:
         ports:
             - "9443:9443"
         volumes:
-            - ./:/app/output/config
+            - ~/configs:/app/output/config
         command: /app/output/main
