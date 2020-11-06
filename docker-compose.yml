@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+    web:
+        container_name: oagtransformer
+        image:  vrspraveen/oag-hackathon:version3
+        ports:
+            - "9443:9443"
+        command: /app/output/main
