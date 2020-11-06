@@ -85,7 +85,7 @@ func printCronEntries(cronEntries []cron.Entry) {
 
 func setConfig() Nodes {
 
-	configFile, err := os.Open("config/conf.json")
+	configFile, err := os.Open("/app/output/config/conf.json")
 	if err != nil {
 		log.Fatal(err)
 	}
