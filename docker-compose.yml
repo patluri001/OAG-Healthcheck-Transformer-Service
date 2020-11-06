@@ -5,4 +5,6 @@ services:
         image:  vrspraveen/oag-hackathon:version3
         ports:
             - "9443:9443"
+        volumes:
+            - ./:/app/output/config
         command: /app/output/main
