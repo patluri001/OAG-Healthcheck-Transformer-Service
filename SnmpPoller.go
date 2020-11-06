@@ -16,29 +16,39 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 	oidResult := OidResult{}
 
 	mibs := map[string]string{
-		".1.3.6.1.4.1.2021.4.5.0":  "memory_total_installed",
-		".1.3.6.1.4.1.2021.4.6.0":  "memory_total_used",
-		".1.3.6.1.4.1.2021.4.11.0": "memory_total_free",
-		".1.3.6.1.4.1.2021.4.13.0": "memory_total_shared",
-		".1.3.6.1.4.1.2021.4.14.0": "memory_total_buffered",
-		".1.3.6.1.4.1.2021.4.15.0": "memory_total_cached",
-		".1.3.6.1.4.1.2021.4.3.0":  "swap_mem_total_size",
-		".1.3.6.1.4.1.2021.4.4.0":  "swap_mem_available",
-		//	".1.3.6.1.2.1.25.1.1.0":    "system_uptime",
-		//".1.3.6.1.4.1.2021.2.*.1":    "session_cache_service",
-		".1.3.6.1.2.1.31.1.1.1.6.3":  "network_interface_in",
-		".1.3.6.1.2.1.31.1.1.1.10.3": "network_interface_out",
-		//".1.3.6.1.4.1.2021.9.1.2.1":  "disk_path",
-		".1.3.6.1.4.1.2021.9.1.6.1": "disk_total_size",
-		".1.3.6.1.4.1.2021.9.1.7.1": "disk_total_available",
-		".1.3.6.1.4.1.2021.9.1.9.1": "disk_percentage_used",
-		//	".1.3.6.1.2.1.1.1.0":         "sys_obj_oag_appliance",
-		//	".1.3.6.1.2.1.1.4.0":         "sys_obj_oag_support",
-		//	".1.3.6.1.2.1.1.5.0":         "sys_obj_dev",
-		//".1.3.6.1.4.1.2021.10.1.3.1": "sys_onemin_average",
+		".1.3.6.1.4.1.2021.4.5.0":      "memory_total_installed",
+		".1.3.6.1.4.1.2021.4.6.0":      "memory_total_used",
+		".1.3.6.1.4.1.2021.4.11.0":     "memory_total_free",
+		".1.3.6.1.4.1.2021.4.13.0":     "memory_total_shared",
+		".1.3.6.1.4.1.2021.4.14.0":     "memory_total_buffered",
+		".1.3.6.1.4.1.2021.4.15.0":     "memory_total_cached",
+		".1.3.6.1.4.1.2021.4.3.0":      "swap_mem_total_size",
+		".1.3.6.1.4.1.2021.4.4.0":      "swap_mem_available",
+		".1.3.6.1.2.1.25.1.1.0":        "system_uptime",
+		".1.3.6.1.2.1.1.1.0":           "system_description",
+		".1.3.6.1.2.1.1.4.0":           "system_contact",
+		".1.3.6.1.2.1.1.5.0":           "system_Location",
+		".1.3.6.1.2.1.1.6.0":           "system_Name",
+		".1.3.6.1.4.1.2021.10.1.3.1":   "sys_onemin_average",
+		".1.3.6.1.4.1.2021.10.1.3.2":   "sys_fivemin_average",
+		".1.3.6.1.4.1.2021.10.1.3.3":   "sys_fifteenmin_average",
+		".1.3.6.1.2.1.31.1.1.1.6.1":    "network_interface_in_1",
+		".1.3.6.1.2.1.31.1.1.1.6.2":    "network_interface_in_2",
+		".1.3.6.1.2.1.31.1.1.1.6.3":    "network_interface_in_3",
+		".1.3.6.1.2.1.31.1.1.1.10.1":   "network_interface_out_1",
+		".1.3.6.1.2.1.31.1.1.1.10.2":   "network_interface_out_2",
+		".1.3.6.1.2.1.31.1.1.1.10.3":   "network_interface_out_3",
+		".1.3.6.1.4.1.2021.9.1.2.1":    "disk_path",
+		".1.3.6.1.4.1.2021.9.1.5.1":    "disk_min_percentage",
+		".1.3.6.1.4.1.2021.9.1.6.1":    "disk_total_size",
+		".1.3.6.1.4.1.2021.9.1.7.1":    "disk_total_available",
+		".1.3.6.1.4.1.2021.9.1.9.1":    "disk_percentage_used",
 		".1.3.6.1.4.1.2021.16.2.1.1.1": "poll_session_logwatch_1",
 		".1.3.6.1.4.1.2021.16.2.1.1.2": "poll_session_logwatch_2",
 		".1.3.6.1.4.1.2021.16.2.1.1.3": "poll_session_logwatch_3",
+		".1.3.6.1.4.1.2021.16.2.1.2.1": "poll_session_logwatch_session_db_connection",
+		".1.3.6.1.4.1.2021.16.2.1.2.2": "poll_session_logwatch_session_db_storing",
+		".1.3.6.1.4.1.2021.16.2.1.2.3": "poll_session_logwatch_session_db_get",
 		".1.3.6.1.4.1.2021.2.1.5.3":    "poll_process_objects_HA",
 		".1.3.6.1.4.1.2021.2.1.4.3":    "poll_process_objects_Time_Svc",
 		".1.3.6.1.4.1.2021.2.1.3.3":    "poll_process_objects_web_proc_svc",
@@ -82,12 +92,16 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 		//fmt.Println("oidResult.OidName", oidResult.OidName)
 		// the Value of each variable returned by Get() implements
 		// interface{}. You could do a type switch...
+		//fmt.Println("variable.Type ", variable.Type)
+		//fmt.Println("oidResult.Oid ", oidResult.Oid)
+
 		switch variable.Type {
 		case g.OctetString:
-			bytes := variable.Value.([]byte)
-
-			fmt.Printf("string: %s\n", string(bytes))
-
+			//bytes := variable.Value.([]byte)
+			value := variable.Value.(string)
+			//fmt.Printf("string: %s\n", string(bytes))
+			//fmt.Println("string: %s\n", value)
+			*OidResultSet = append(*OidResultSet, oidResult.OagNode+"_"+oidResult.OidName+" "+value)
 		default:
 			// ... or often you're just interested in numeric values.
 			// ToBigInt() will return the Value as a BigInt, for plugging
