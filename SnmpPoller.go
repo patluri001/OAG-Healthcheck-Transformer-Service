@@ -46,12 +46,12 @@ func SnmpPoller(config *Configuration, OidResultSet *[]string) {
 		".1.3.6.1.4.1.2021.16.2.1.1.1": "poll_session_logwatch_1",
 		".1.3.6.1.4.1.2021.16.2.1.1.2": "poll_session_logwatch_2",
 		".1.3.6.1.4.1.2021.16.2.1.1.3": "poll_session_logwatch_3",
-		".1.3.6.1.4.1.2021.16.2.1.2.1": "poll_session_logwatch_session_db_connection",
-		".1.3.6.1.4.1.2021.16.2.1.2.2": "poll_session_logwatch_session_db_storing",
-		".1.3.6.1.4.1.2021.16.2.1.2.3": "poll_session_logwatch_session_db_get",
-		".1.3.6.1.4.1.2021.2.1.5.3":    "poll_process_objects_HA",
-		".1.3.6.1.4.1.2021.2.1.4.3":    "poll_process_objects_Time_Svc",
-		".1.3.6.1.4.1.2021.2.1.3.3":    "poll_process_objects_web_proc_svc",
+		//".1.3.6.1.4.1.2021.16.2.1.2.1": "poll_session_logwatch_session_db_connection",
+		//".1.3.6.1.4.1.2021.16.2.1.2.2": "poll_session_logwatch_session_db_storing",
+		//".1.3.6.1.4.1.2021.16.2.1.2.3": "poll_session_logwatch_session_db_get",
+		".1.3.6.1.4.1.2021.2.1.5.3": "poll_process_objects_HA",
+		".1.3.6.1.4.1.2021.2.1.4.3": "poll_process_objects_Time_Svc",
+		".1.3.6.1.4.1.2021.2.1.3.3": "poll_process_objects_web_proc_svc",
 	}
 
 	oids := make([]string, 0, len(mibs))
